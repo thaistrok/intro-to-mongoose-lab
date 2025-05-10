@@ -1,22 +1,22 @@
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config(); 
 const mongoose = require('mongoose');
 const prompt = require('prompt-sync')();
-const Customer = require('./models/Customer'); // Import the Customer model
+const Customer = require('./models/Customer'); //Customer model
 
-// Function to connect to the database
+
 const connectDb = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB connected successfully.');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    process.exit(1); // Exit if connection fails
+    process.exit(1);
   }
 };
 
-// Main application logic
+
 const run = async () => {
-  await connectDb(); // Connect to the database first
+  await connectDb();
 
   console.log('Welcome to the CRM\n');
 
@@ -66,18 +66,18 @@ const run = async () => {
           const customersToUpdate = await Customer.find({});
           if (customersToUpdate.length === 0) {
             console.log('\nNo customers to update.\n');
-            break; // Go back to main menu if no customers
+            break; // Go back to customers
           }
 
           console.log('\nBelow is a list of customers: \n');
           customersToUpdate.forEach(customer => {
             console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`);
           });
-          console.log(''); // Add a newline for spacing
+          console.log('');
 
           const idToUpdate = prompt('Copy and paste the id of the customer you would like to update here: ');
 
-          // Validate if the ID is a valid MongoDB ObjectId format
+          
           if (!mongoose.Types.ObjectId.isValid(idToUpdate)) {
              console.log('\nInvalid ID format.\n');
              break;
@@ -92,17 +92,17 @@ const run = async () => {
           const newName = prompt(`What is the customer's new name? (Current: ${customerToUpdate.name}) `);
           const newAge = prompt(`What is the customer's new age? (Current: ${customerToUpdate.age}) `);
 
-          // Use findByIdAndUpdate for atomic update
+          // findByIdAndUpdate 
           const updatedCustomer = await Customer.findByIdAndUpdate(
             idToUpdate,
-            { name: newName || customerToUpdate.name, age: newAge || customerToUpdate.age }, // Keep old value if new one is empty
-            { new: true } // Return the updated document
+            { name: newName || customerToUpdate.name, age: newAge || customerToUpdate.age }, 
+            { new: true } 
           );
 
           if (updatedCustomer) {
             console.log(`\nCustomer updated successfully: id: ${updatedCustomer._id} -- Name: ${updatedCustomer.name}, Age: ${updatedCustomer.age}\n`);
           } else {
-             // This case might be redundant due to the findById check above, but good for safety
+             
             console.log('\nFailed to update customer. Customer might have been deleted.\n');
           }
 
@@ -116,24 +116,24 @@ const run = async () => {
           const customersToDelete = await Customer.find({});
           if (customersToDelete.length === 0) {
             console.log('\nNo customers to delete.\n');
-            break; // Go back to main menu if no customers
+            break; 
           }
 
           console.log('\nBelow is a list of customers: \n');
           customersToDelete.forEach(customer => {
             console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`);
           });
-           console.log(''); // Add a newline for spacing
+           console.log(''); 
 
           const idToDelete = prompt('Copy and paste the id of the customer you would like to delete here: ');
 
-          // Validate if the ID is a valid MongoDB ObjectId format
+          
           if (!mongoose.Types.ObjectId.isValid(idToDelete)) {
              console.log('\nInvalid ID format.\n');
              break;
           }
 
-          // Use findByIdAndDelete for atomic deletion
+          
           const deletedCustomer = await Customer.findByIdAndDelete(idToDelete);
 
           if (deletedCustomer) {
